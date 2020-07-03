@@ -13,7 +13,7 @@ pull_string_v11 <- function(genes_keep, min_score = 0){
   
   string_genes_keep <- gene2string[genes_keep]
   string2gene <- names(string_genes_keep); names(string2gene) <- unname(string_genes_keep)
-  print(paste0("WARNING: ", paste(genes_keep[is.na(string2gene)], collapse = ","), " not found"))
+  #print(paste0("WARNING: ", paste(genes_keep[is.na(string2gene)], collapse = ","), " not found"))
 
     # Now filter
   data <- string_v11 %>% filter(combined_score > min_score) %>%
