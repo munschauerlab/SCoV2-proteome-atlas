@@ -6,6 +6,7 @@ library(clusterProfiler)
 library(msigdbr)
 library(xlsx)
 
+"%ni%" <- Negate("%in%")
 
 # Import differential gene expression
 all <- fread("../data/SCoV2_bulkProteome.txt") %>% arrange(log(P.Value.SCoV.over.Mock)) %>%
@@ -47,19 +48,32 @@ collapsedPathways <- collapsePathways(fgseaRes_hallmark[order(pval)][padj < 0.1]
                                       pathway_list_hallmark, geneList)
 mainPathways <- fgseaRes_hallmark[pathway %in% names(collapsedPathways$parentPathways)][
   order(-abs(NES)*(sign(NES) + 2)), pathway]
-pdf("../output/GSEA_hallmark_viz.pdf", width = 6, height = 8)
-plotGseaTable(pathway_list_hallmark[mainPathways], geneList, fgseaRes_hallmark, 
+
+selected <- c("TNFA_SIGNALING_VIA_NFKB", "TGF_BETA_SIGNALING", "IL6_JAK_STAT3_SIGNALING", "INTERFERON_GAMMA_RESPONSE", "INTERFERON_ALPHA_RESPONSE")
+others <- mainPathways[mainPathways %ni% selected]
+
+pdf("../output/GSEA_hallmark_viz-main.pdf", width = 6, height = 3)
+plotGseaTable(pathway_list_hallmark[selected], geneList, fgseaRes_hallmark, 
               gseaParam = 0.5)
 dev.off()
 
 
+pdf("../output/GSEA_hallmark_viz-supp.pdf", width = 6, height = 5)
+plotGseaTable(pathway_list_hallmark[others], geneList, fgseaRes_hallmark, 
+              gseaParam = 0.5)
+dev.off()
 
 # Export pathways
 selected_pathways <- c("GO_RESPONSE_TO_TYPE_I_INTERFERON","GO_REGULATION_OF_MAPK_CASCADE", "GO_POSITIVE_REGULATION_OF_MAP_KINASE_ACTIVITY")
 fgseaRes_c5bp %>% filter(pathway %in% selected_pathways)
 
+fgseaRes_hallmark[,c(1:7)] %>% arrange((pval)) %>% 
+  write.xlsx("../output/TableS6_GO_BP_Proteome_GSEA.xlsx", sheetName = "Hallmark", 
+             col.names = TRUE, row.names = FALSE, append = TRUE)
 fgseaRes_c5bp[,c(1:7)] %>% arrange((padj)) %>% 
-  write.xlsx("../output/TableSX_GO_BP_Proteome_GSEA-30June.xlsx", sheetName = "MSigDB C5 BP", 
-             col.names = TRUE, row.names = FALSE, append = FALSE)
+  write.xlsx("../output/TableS6_GO_BP_Proteome_GSEA.xlsx", sheetName = "MSigDB C5 BP", 
+             col.names = TRUE, row.names = FALSE, append = TRUE)
+
+
 
 
