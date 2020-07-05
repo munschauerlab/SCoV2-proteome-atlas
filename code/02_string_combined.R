@@ -33,8 +33,9 @@ df_filt$N2inRAP <- df_filt$node2 %in% rap$geneSymbol
 
 df_filt2 <- df_filt[(df_filt$N1inRAP + df_filt$N2inRAP) ==1 ,]
 
-#write.table(df_filt2, file = "../output/string/RAP_MS_STRING_network.tsv", 
-#            sep = "\t", quote = FALSE, col.names = TRUE, row.names = FALSE)
+write.xlsx(df_filt2, "../output/TableS7_interactome_regulated_network.xlsx",
+           sheetName = "Network", 
+           col.names = TRUE, row.names = FALSE, append = TRUE)
 
 # Visualize network
 edges <- df_filt2[,c("node1", "node2", "combined_score")]
@@ -51,7 +52,6 @@ colnames(sm) <- levels
 net <- network(sm)
 
 # Show the full network
-IFN <- c("STAT1","IRF9","STAT2","TYK2","JAK1","IFIT1","IFIT3","IFITM3","OAS2","SG15","BST2","SP110","UBE2L6","ADAR","TGIF1","RXRA","BRD3","IFI30")
 color_vec <- case_when(
   levels %in% c(rap$geneSymbol) & levels %in% c(top1ms$geneSymbol) ~ "both", 
   levels %in% c(rap$geneSymbol) ~ "RAP",

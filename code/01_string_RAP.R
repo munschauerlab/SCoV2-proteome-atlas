@@ -16,6 +16,9 @@ rap_genes <- rap %>% pull(geneSymbol)
 
 # Make string network
 edges <- pull_string_v11(min_score = 550, genes_keep = rap_genes)
+write.xlsx(edges, "../output/TableS4_interactome_only_network.xlsx",
+           sheetName = "Interactome", 
+           col.names = TRUE, row.names = FALSE, append = TRUE)
 
 # QC genes that may be missing
 qc_genes <- c("SCFD1", "RAB6C", "RAB7A", "GDI2")
