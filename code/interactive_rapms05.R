@@ -1,5 +1,5 @@
 #' ---
-#' title: "SARS CoV2 RAP-MS interaction network"
+#' title: "SARS CoV2 RAP-MS interaction network- adj. P 0.05 cutoff"
 #' author: "Caleb Lareau, Mathias Munschauer"
 #' date: "`r Sys.Date()`"
 #' output: html_document
@@ -21,7 +21,7 @@ if(!exists("string_v11")){
 # Import gene names
 rap <- fread("../data/SCoV2_RAPms.txt") %>%
   
-  filter(adj.P.Val.SCoV2.over.RMRP < 0.2 & species == "HOMO SAPIENS" & logFC.SCoV2.over.RMRP > 0)
+  filter(adj.P.Val.SCoV2.over.RMRP < 0.05 & species == "HOMO SAPIENS" & logFC.SCoV2.over.RMRP > 0)
 rap_genes <- rap %>% pull(geneSymbol)
 
 # Make string network
