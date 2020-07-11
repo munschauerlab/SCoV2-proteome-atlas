@@ -4,8 +4,7 @@ SARS-CoV-2 infections pose a global health threat and an unprecedented research 
 
 ## Online Resources
 
-- [Refined interactive RAP-MS network](code/interactive_rapms05.html) for mRNA viral-associated genes.
-- [Expanded interactive RAP-MS network](code/interactive_rapms20.html) for mRNA viral-associated genes.
+- [Interactive RAP-MS network](code/interactive_rapms20.html) for mRNA viral-associated genes.
 
 ## Contact
 
