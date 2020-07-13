@@ -4,7 +4,7 @@ SARS-CoV-2 infections pose a global threat to human health and an unprecedented 
 
 ## Online Resources
 
-- [Interactive RAP-MS network](code/interactive_rapms20.html) for mRNA viral-associated genes.
+- [Interactive RAP-MS network](code/interactive_rapms20.html) for SARS-CoV-2 RNA interactome proteins.
 - [Supplemental tables](supplement/SCoV2-Proteome-Atlas-Supplemental-Tables.zip) associated with the manuscript.
 
 ## Contact
