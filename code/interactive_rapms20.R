@@ -8,7 +8,7 @@
 #' Select a specifc node to visualize STRING interactions associated with the specific protein. 
 #' 
 #' 
-#' Genes associated with a 'response to virus' pathway are shown in purple while other genes previous associated with viral RNA are shown in blue. Other significant genes at an adj. P < 0.2 are shown in grey from the RAP-MS experiment.
+#' Genes associated with ribosomal proteins are shown in purple while other genes previous associated with viral RNA are shown in blue. Other significant genes at an adj. P < 0.2 are shown in grey from the RAP-MS experiment.
 #+ cache = FALSE, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE,
 # Import libraries
 
@@ -49,7 +49,7 @@ viral_rna <- c("ATP1A1","CAPRIN1","CFL1","CSDE1","DDX1","DDX3X","EEF1A1","EEF2",
                "RPL28","RPL3","RPL36A","RPL6","RPL7A","RPL8","RPS11","RPS12","RPS14","RPS2","RPS26","RPS3","RPS4X","RPS5","SND1","SYNCRIP","UPF1","YBX1")
 
 color_vec <- case_when(
-  levels %in% rtv ~ "Response to Virus",
+  grepl("^RP", levels) ~ "RP",
   levels %in% viral_rna ~ "Viral-associated",
   TRUE ~ "Other"
 )
@@ -75,7 +75,7 @@ visNetwork( nodes_df, edges_df) %>%
   visNodes(font = list(size = 40)) %>%
   visPhysics(stabilization = FALSE)  %>%
   visGroups(groupname = "Other", color = "grey") %>%
-  visGroups(groupname = "Response to Virus", color = "#912cee") %>%
+  visGroups(groupname = "RP", color = "#912cee") %>%
   visGroups(groupname = "Viral-associated", color = "#104e8b") %>%
   visEdges(color = list(highlight = "blue", hover = "blue",  smooth = FALSE)) %>%
   visOptions(highlightNearest = list(enabled = TRUE, degree = 1,
