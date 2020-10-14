@@ -11,17 +11,18 @@ cnbp <- cnbp[cnbp@seqnames %in% keep_chrs]
 larp1 <- larp1[larp1@seqnames %in% keep_chrs]
 
 # import RNA biotypes
-rnatypes <- fread("../data/hg38_rnatypes.bed",
+rnatypes <- fread("../data/metagene_pileup/hg38_rnatypes.bed",
                   col.names = c("chr", "start", "end", "g", "m", "a", "what", "type"))
 sort(table(rnatypes$type))
+rt_gr <- makeGRangesFromDataFrame(data.frame(rnatypes), keep.extra.columns = TRUE)
 protein_coding_rna <- rt_gr[rnatypes$type == "protein_coding"]
 lncrna <- rt_gr[rnatypes$type == "lncRNA"]
 pseudo <- rt_gr[grepl("pseudo", rnatypes$type)]
 
 # Annotate further
-x5utr <- diffloop::bedToGRanges("../data/annotations/hg38-5utr.bed")
-cds <- diffloop::bedToGRanges("../data/annotations/hg38-cds.bed")
-x3utr <- diffloop::bedToGRanges("../data/annotations/hg38-3utr.bed")
+x5utr <- diffloop::bedToGRanges("../data/metagene_pileup/hg38_merged_5utr.bed")
+cds <- diffloop::bedToGRanges("../data/metagene_pileup/hg38_merged_cds.bed")
+x3utr <- diffloop::bedToGRanges("../data/metagene_pileup/hg38_merged_3utr.bed")
 
 # Function to score imported RNAs
 score_assign_prioirity <- function(gr_in){

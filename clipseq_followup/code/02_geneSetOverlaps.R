@@ -1,31 +1,64 @@
-library(ChIPpeakAnno)
-library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+library(data.table)
 library(BuenColors)
+library(annotables)
+library(dplyr)
+library(Matrix)
+library(msigdbr)
+library(tidyverse)
 
 ## import the MACS output
-cnbp <- diffloop::bedToGRanges("CNBPmacs2_summits.bed")
-larp1 <- diffloop::bedToGRanges("LARP1macs2_summits.bed")
-ordering <- c("fiveUTRs", "threeUTRs", "Promoters", "Exons", "Introns",
-  "immediateDownstream" )
-aCNBP<-assignChromosomeRegion(cnbp, nucleotideLevel=FALSE, 
-                              precedence=ordering, 
-                              TxDb=TxDb.Hsapiens.UCSC.hg38.knownGene)
-aLARP1<-assignChromosomeRegion(larp1, nucleotideLevel=FALSE, 
-                               precedence=ordering, 
-                               TxDb=TxDb.Hsapiens.UCSC.hg38.knownGene)
+cnbp <- diffloop::bedToGRanges("../data/macs2/CNBP_ns_summits.bed") %>% diffloop::rmchr()
+larp1 <- diffloop::bedToGRanges("../data/macs2/LARP1_ns_summits.bed")%>% diffloop::rmchr()
+protein_coding_rna <- data.frame(grch38[,c(3:6,8)] %>% filter(biotype == "protein_coding")) %>%
+  makeGRangesFromDataFrame(keep.extra.columns = TRUE, ignore.strand = TRUE)
 
-df <- rbind(data.frame(Freq=aCNBP$percentage, factor = "CNBP", what = names(aCNBP$percentage)), 
-            data.frame(Freq=aLARP1$percentage, factor = "LARP1", what = names(aCNBP$percentage)))
+cnbp_genes <- protein_coding_rna$symbol[unique(subjectHits(findOverlaps(cnbp, protein_coding_rna)))]
+larp1_genes <- protein_coding_rna$symbol[unique(subjectHits(findOverlaps(larp1, protein_coding_rna)))]
+all_genes <- protein_coding_rna$symbol
 
+# Get msigdb
+h_df_c5bp = msigdbr(species = "Homo sapiens") %>% dplyr::filter(gs_cat == "C5" & gs_subcat == "BP")
+pathway_list_c5bp = h_df_c5bp %>% split(x = .$gene_symbol, f = .$gs_name)
 
-orderingp <- c("fiveUTRs",  "Promoters", "Exons", "Introns","threeUTRs",
-              "immediateDownstream",  "Intergenic.Region")
-df$what_order <- factor(as.character(df$what), orderingp)
+computeFisherOverlapP <- function(clip_genes){
+  
+  # Do Fisher tests manually
+  h_df_filt <- h_df_c5bp %>% filter(human_gene_symbol %in% all_genes)
+  n_denom <- length(unique(h_df_filt$human_gene_symbol))
+  
+  # Function to get all of the 
+  get_fisher_tests <- function(overlap_genes,  min_size = 3){
+    h_df_filt2 <- h_df_filt %>% mutate(hit = human_gene_symbol %in% overlap_genes)
+    analysis <- h_df_filt2 %>%group_by(gs_name) %>%
+      summarize(a = sum(hit), n = n()) %>%
+      mutate(b = n-a, c = length(overlap_genes)-a) %>% mutate(d = n_denom - a - b -c) %>%
+      filter(a >= min_size) %>%
+      nest(-gs_name, -n) %>% 
+      mutate(matrix = map(data, ~matrix(unlist(.x), nrow = 2))) %>% 
+      mutate(fisher = map(matrix, ~fisher.test(.x))) %>% 
+      mutate(stats = map(fisher, ~broom::glance(.x)))
+    
+    if(dim(analysis)[1] == 0){
+      return(NULL)
+    }
+    
+    # unnest to report statistical significance
+    analysis %>%
+      unnest(stats) %>%
+      dplyr::select(gs_name, n, p.value, odds = estimate) %>%
+      mutate(padj = p.adjust(p.value)) %>% arrange(p.value)
+    }
+  get_fisher_tests(clip_genes)
+}
 
-p1 <- ggplot(df,aes(x = what_order, y = Freq.Freq, fill = factor)) + 
-  geom_bar(stat = "identity", position = 'dodge', color = 'black') +
-  pretty_plot(fontsize = 7) + L_border() + theme(legend.position = "bottom") +
-  scale_y_continuous(expand  = c(0,0)) +
-  scale_fill_manual(values = c("lightgrey", "darkgrey")) +
-  labs(x = "", y = "% CLIP peaks", color = "")
-cowplot::ggsave2(p1, file = "overlaps_11October2020.pdf", width = 2.5, height = 2.7)
+# Top Filt uses the differential bulk proteome
+# all uses all genes detected by the proteome
+cnbp_enrichments <- computeFisherOverlapP(cnbp_genes)
+larp1_enrichments <- computeFisherOverlapP(larp1_genes)
+
+write.table(cnbp_enrichments, file = "../output/top_go_enrich-CNBP_clip.tsv",
+            sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+
+write.table(larp1_enrichments, file = "../output/top_go_enrich-LARP1_clip.tsv",
+            sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+

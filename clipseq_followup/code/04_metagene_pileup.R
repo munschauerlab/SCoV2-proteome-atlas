@@ -2,13 +2,13 @@ library(data.table)
 library(ggplot2)
 library(BuenColors)
 
-CNBP_cds <- fread("CNBP_cds.tsv.gz", header = FALSE)
-CNBP_5utr <- fread("CNBP_5utr.tsv.gz", header = FALSE)
-CNBP_3utr <- fread("CNBP_3utr.tsv.gz", header = FALSE)
+CNBP_cds <- fread("../data/metagene_pileup/CNBP_cds.tsv.gz", header = FALSE)
+CNBP_5utr <- fread("./data/metagene_pileup/CNBP_5utr.tsv.gz", header = FALSE)
+CNBP_3utr <- fread("./data/metagene_pileup/CNBP_3utr.tsv.gz", header = FALSE)
 
-LARP1_cds <- fread("LARP1_cds.tsv.gz", header = FALSE)
-LARP1_5utr <- fread("LARP1_5utr.tsv.gz", header = FALSE)
-LARP1_3utr <- fread("LARP1_3utr.tsv.gz", header = FALSE)
+LARP1_cds <- fread("./data/metagene_pileup/LARP1_cds.tsv.gz", header = FALSE)
+LARP1_5utr <- fread("./data/metagene_pileup/LARP1_5utr.tsv.gz", header = FALSE)
+LARP1_3utr <- fread("./data/metagene_pileup/LARP1_3utr.tsv.gz", header = FALSE)
 
 larp1_df <- rbind(
   data.frame(
@@ -26,14 +26,6 @@ larp1_df <- rbind(
     score = colMeans(data.matrix(data.frame(LARP1_3utr[,c(7:106)])), na.rm = TRUE),
     what = "3UTR"
   ))
-
-ggplot(larp1_df, aes(x = position, y = score, color = what)) +
-  geom_point()
-
-geom_vline(xintercept = c(200, 700), linetype = 2) +
-  pretty_plot() + L_border() +
-  labs(x = "Arbitrary-- 200 is TSS; 700 is TES; otherwise shows +/- 2kb on the outside (strand adjusted)",
-       y = "CNBP Signal")
 
 
 cnbp_df <- rbind(
@@ -75,5 +67,5 @@ p2 <- ggplot(larp1_df, aes(x = position, y = score, color = what)) +
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
 
-cowplot::ggsave2(p1, file = "CNBP_metagene.pdf", width = 3, height = 2)
-cowplot::ggsave2(p2, file = "LARP1_metagene.pdf", width = 3, height = 2)
+cowplot::ggsave2(p1, file = "../plots/CNBP_metagene.pdf", width = 3, height = 2)
+cowplot::ggsave2(p2, file = "../plots/LARP1_metagene.pdf", width = 3, height = 2)
