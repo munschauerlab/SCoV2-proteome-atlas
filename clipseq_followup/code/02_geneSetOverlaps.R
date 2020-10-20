@@ -30,10 +30,10 @@ computeFisherOverlapP <- function(clip_genes){
   get_fisher_tests <- function(overlap_genes,  min_size = 3){
     h_df_filt2 <- h_df_filt %>% mutate(hit = human_gene_symbol %in% overlap_genes)
     analysis <- h_df_filt2 %>%group_by(gs_name) %>%
-      summarize(a = sum(hit), n = n()) %>%
+      summarize(a = sum(hit), n = n(), gene_hits =  paste(human_gene_symbol[hit],collapse = ",") ) %>%
       mutate(b = n-a, c = length(overlap_genes)-a) %>% mutate(d = n_denom - a - b -c) %>%
       filter(a >= min_size) %>%
-      nest(-gs_name, -n) %>% 
+      nest(-gs_name, -n, -gene_hits) %>% 
       mutate(matrix = map(data, ~matrix(unlist(.x), nrow = 2))) %>% 
       mutate(fisher = map(matrix, ~fisher.test(.x))) %>% 
       mutate(stats = map(fisher, ~broom::glance(.x)))
@@ -45,7 +45,7 @@ computeFisherOverlapP <- function(clip_genes){
     # unnest to report statistical significance
     analysis %>%
       unnest(stats) %>%
-      dplyr::select(gs_name, n, p.value, odds = estimate) %>%
+      dplyr::select(gs_name, gene_hits, n, p.value, odds = estimate) %>%
       mutate(padj = p.adjust(p.value)) %>% arrange(p.value)
     }
   get_fisher_tests(clip_genes)

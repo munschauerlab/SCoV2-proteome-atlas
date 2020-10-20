@@ -132,8 +132,24 @@ p_iep <-  ggnet2(net, label = iep, color = "iep",  legend.position = "none", mod
 cowplot::ggsave2(p_iep, file = "../output/string/network_iep.pdf", width = 4, height = 3)
 
 
+
+# Make new
+Bouhaddou <- readxl::read_xlsx("../data/Bouhaddou2020_TS1.xlsx") %>%
+  data.frame() %>%
+  filter(Inf_00Hr.adj.pvalue < 0.05 | Inf_02Hr.adj.pvalue < 0.05 | Inf_04Hr.adj.pvalue < 0.05 | Inf_08Hr.adj.pvalue < 0.05 | Inf_12Hr.adj.pvalue < 0.05 |  Inf_24Hr.adj.pvalue < 0.05 )
+BP <- unique(Bouhaddou$Gene_Name)
+
+# Annotate colors
+net %v% "BP" = (levels %in% BP)
+
+set.seed(1)
+p_rb <-  ggnet2(net, label = BP, color = "BP",  legend.position = "none", mode = "fruchtermanreingold",
+                layout.par = list(repulse.rad = 2000), alpha = 0.75, size = "size_of_node", size.cut = 10,
+                palette = c("FALSE" = "grey", "TRUE" = "firebrick"),
+                label.size = 2) +  guides( size = FALSE)
+
 library(cowplot)
-cowplot::ggsave2(plot_grid(pAI,plot_grid(p_rtv, pDrug, ncol = 1), nrow = 1, rel_widths = c(1.25, 0.75)),
-                 file = "../output/string/networks_3_grid.pdf", width = 8, height = 5)
+cowplot::ggsave2(plot_grid(pAI,plot_grid(p_rb, pDrug, ncol = 1), nrow = 1, rel_widths = c(1.25, 0.75)),
+                 file = "../output/string/networks_3_grid_rev.pdf", width = 8, height = 5)
 
 

@@ -71,5 +71,5 @@ p_rb <-  ggnet2(net, label = BP, color = "BP",  legend.position = "none", mode =
                 layout.par = list(repulse.rad = 2000), alpha = 0.75, size = "size_of_node", size.cut = 10,
                 palette = c("FALSE" = "grey", "TRUE" = "firebrick"),
                 label.size = 2) +  guides( size = FALSE)
-cowplot::ggsave2(p_rb, file = "../output/string/RAP-network_Bouhaddou.pdf", width = 4, height = 3)
+cowplot::ggsave2(p_rb, file = "../output/string/RAP-network_Bouhaddou.pdf", width = 4, height = 3.5)
 
