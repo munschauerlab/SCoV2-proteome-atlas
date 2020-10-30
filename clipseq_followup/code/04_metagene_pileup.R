@@ -1,14 +1,15 @@
 library(data.table)
 library(ggplot2)
 library(BuenColors)
+library(matrixStats)
 
-CNBP_cds <- fread("../data/metagene_pileup/CNBP_cds.tsv.gz", header = FALSE)
-CNBP_5utr <- fread("./data/metagene_pileup/CNBP_5utr.tsv.gz", header = FALSE)
-CNBP_3utr <- fread("./data/metagene_pileup/CNBP_3utr.tsv.gz", header = FALSE)
+CNBP_cds <- fread("../output/CNBP_cds.tsv.gz", header = FALSE)
+CNBP_5utr <- fread("../output/CNBP_5utr.tsv.gz", header = FALSE)
+CNBP_3utr <- fread("../output/CNBP_3utr.tsv.gz", header = FALSE)
 
-LARP1_cds <- fread("./data/metagene_pileup/LARP1_cds.tsv.gz", header = FALSE)
-LARP1_5utr <- fread("./data/metagene_pileup/LARP1_5utr.tsv.gz", header = FALSE)
-LARP1_3utr <- fread("./data/metagene_pileup/LARP1_3utr.tsv.gz", header = FALSE)
+LARP1_cds <- fread("../output/LARP1_cds.tsv.gz", header = FALSE)
+LARP1_5utr <- fread("../output/LARP1_5utr.tsv.gz", header = FALSE)
+LARP1_3utr <- fread("../output/LARP1_3utr.tsv.gz", header = FALSE)
 
 larp1_df <- rbind(
   data.frame(
