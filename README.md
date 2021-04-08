@@ -4,6 +4,7 @@ Characterizing the interactions that SARS-CoV-2 viral RNAs make with host cell p
 ## Online Resources
 
 - [Interactive RAP-MS network](code/interactive_rapms20.html) for SARS-CoV-2 RNA interactome proteins.
+- [Supplemental tables](supplement/SCoV2-Proteome-Atlas-Supplemental-Tables.zip) associated with the manuscript.
 
 ## Contact
 
